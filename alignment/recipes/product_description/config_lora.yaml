@@ -1,0 +1,75 @@
+# Model arguments
+model_name_or_path: mistralai/Mistral-7B-v0.1
+model_revision: main
+torch_dtype: bfloat16
+use_flash_attention_2: true
+
+# LoRA arguments
+load_in_4bit: false
+use_peft: true
+lora_r: 8
+lora_alpha: 16
+lora_dropout: 0.05
+lora_target_modules:
+- q_proj
+- v_proj
+
+# Data training arguments
+dataset_name: iarbel/amazon-product-data-filter
+dataset_splits:
+  train: train
+  validation: validation
+preprocessing_num_workers: 4
+
+# SFT trainer config
+bf16: true
+do_eval: true
+evaluation_strategy: steps
+eval_steps: 50
+gradient_accumulation_steps: 1
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+hub_model_id: iarbel/mistral-for-product-description
+hub_strategy: end
+learning_rate: 5.0e-04
+weight_decay: 1.0e-03
+log_level: info
+logging_steps: 10
+logging_strategy: steps
+lr_scheduler_type: cosine
+lr_scheduler_kwargs:
+  num_cycles: 0.25
+max_seq_length: 768
+max_steps: -1
+num_train_epochs: 2
+output_dir: data/mistral-for-product-description
+overwrite_output_dir: true
+per_device_eval_batch_size: 8
+per_device_train_batch_size: 4
+push_to_hub: true
+report_to:
+- wandb
+wandb_project: LLM_FT
+save_strategy: "steps"
+save_steps: 200
+save_total_limit: 2
+seed: 42
+warmup_ratio: 0.1
+
+# Formatting config
+prompt_template: 'Write feature-bullets for an Amazon product page. Title: {TITLE}. Technical details: {TECH_DATA}.\n'
+prompt_columns:
+  TITLE: title
+  TECH_DATA: tech_process
+response_template: '### Feature-bullets:{FEATURE_BULLETS}'
+response_token_ids:
+- 27332
+- 22114
+- 28733
+- 9258
+- 7835
+- 28747
+pad_token_id: 0
+response_column:
+  FEATURE_BULLETS: labels
